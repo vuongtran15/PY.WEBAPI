@@ -39,7 +39,7 @@ This repository contains a Python-based Web API project.
 To run the application in development mode:
 
 ```bash
-uvicorn main:app --host 0.0.0.0 --port 8080
+uvicorn main:app --host 0.0.0.0 --port 8080 --reload
 ```
 
 The API will be accessible at `http://127.0.0.1:5000/` by default.
