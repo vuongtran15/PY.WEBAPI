@@ -7,5 +7,6 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World aaa"}
 
-app.include_router(user.router, tags=["user"])
 
+
+app.include_router(user.router, prefix="/user", tags=["user"])
