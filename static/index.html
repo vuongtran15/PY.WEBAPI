@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>WebAPI and WebSocket Demo</title>
+    <style>
+        #messages {
+            border: 1px solid #ccc;
+            height: 300px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Login (REST API)</h2>
+        <div>
+            <input type="text" id="empId" placeholder="Employee ID">
+            <input type="password" id="password" placeholder="Password">
+            <button onclick="login()">Login</button>
+        </div>
+
+        <h2>Chat (WebSocket)</h2>
+        <div id="messages"></div>
+        <div>
+            <input type="text" id="messageInput" placeholder="Type your message">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        let ws;
+        let userId;
+
+        connectWebSocket();
+
+        function connectWebSocket() {
+            ws = new WebSocket(`ws://${window.location.host}/ws/123`);
+
+            ws.onmessage = function (event) {
+                const messages = document.getElementById('messages');
+                messages.innerHTML += '<div>' + event.data + '</div>';
+                messages.scrollTop = messages.scrollHeight;
+            };
+
+            ws.onclose = function () {
+                console.log('WebSocket connection closed');
+            };
+        }
+
+        function sendMessage() {
+           
+
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+
+            if (message && ws) {
+                ws.send(message);
+                const messages = document.getElementById('messages');
+                messages.innerHTML += '<div>You: ' + message + '</div>';
+                messages.scrollTop = messages.scrollHeight;
+                messageInput.value = '';
+            }
+        }
+    </script>
+</body>
+
+</html>
