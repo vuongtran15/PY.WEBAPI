@@ -2,15 +2,16 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:15
+    image: mysql:8.0
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=webapi
+      - MYSQL_ROOT_PASSWORD=*123qwe*
+      - MYSQL_DATABASE=chatdb
+      - MYSQL_USER=mysql
+      - MYSQL_PASSWORD=*123qwe*
     ports:
-      - "5432:5432"
+      - "3306:3306"
 
 volumes:
-  postgres_data:
+  mysql_data:
