@@ -1,7 +1,6 @@
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
-from api import user
-from api import chat
+from api import user,chat
 from api.websocket import manager
 
 app = FastAPI()

@@ -2,7 +2,6 @@ import json
 import fastapi
 from fastapi import HTTPException
 from pydantic import BaseModel
-from utils.db_utils import get_db_connection
 import http.client
 
 router = fastapi.APIRouter()
