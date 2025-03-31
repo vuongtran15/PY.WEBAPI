@@ -9,3 +9,43 @@ def get_db_connection():
         return conn
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database connection error: {str(e)}")
+
+def execute_query_none_retrun(conn, query, params=None):
+    # Execute a query that does not return any data (e.g., INSERT, UPDATE, DELETE)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(query, params or [])
+        conn.commit()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Query execution error: {str(e)}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def execute_query_return(conn, query, params=None):
+    # Execute a query that returns data (e.g., SELECT)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(query, params or [])
+        result = cursor.fetchall()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Query execution error: {str(e)}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def execute_query_return_one(conn, query, params=None):
+    # Execute a query that returns a single row of data
+    try:
+        cursor = conn.cursor()
+        cursor.execute(query, params or [])
+        result = cursor.fetchone()
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Query execution error: {str(e)}")
+    finally:
+        cursor.close()
+        conn.close()

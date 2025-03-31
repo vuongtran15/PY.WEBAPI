@@ -22,11 +22,17 @@ async def login_ros(request: LoginRequest):
     data = res.read()
     print(data.decode("utf-8"))
     code_status = res.status
+
+
+
     if code_status == 200:
         # return convert data to json
         json_data = data.decode("utf-8")
         json_data = json.loads(json_data)
+        # create a token from jwt for json_data
+        json_data["token"] = "Bearer " + json_data["token"]
         return json_data
     else:
         raise HTTPException(status_code=code_status, detail="Login failed")
-    
+
+

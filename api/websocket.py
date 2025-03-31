@@ -1,30 +1,59 @@
 from fastapi import WebSocket, WebSocketDisconnect
-from typing import List, Dict
+from typing import  Dict
 
+from services.aidb_services import AIDBContext
+
+
+
+# chatid bao gồm tổ hợp empid__chatid__type__uuid. cách nhau bởi dấu __
 class ConnectionManager:
     def __init__(self):
         self.active_connections: Dict[str, WebSocket] = {}
 
-    async def connect(self, websocket: WebSocket, client_id: str):
+    async def connect(self, websocket: WebSocket, chatid: str):
         await websocket.accept()
-        self.active_connections[client_id] = websocket
+        self.active_connections[chatid] = websocket
 
-    def disconnect(self, client_id: str):
-        if client_id in self.active_connections:
-            del self.active_connections[client_id]
+        parts = chatid.split("__")
+        chatinfo = {
+            "emp_id": parts[0],
+            "chat_id": parts[1],
+            "type": parts[2],
+            "uuid": parts[3]
+        }
+        
+        # Insert chat connection info to database
+        # Initialize database context
+        db_context = AIDBContext()
+        
+        # Insert conversation to database with appropriate fields
+        conversation_id = db_context.insert_conversation(
+            id=chatinfo["chat_id"],
+            emp_id=chatinfo["emp_id"],
+            title=f"New Conversation",
+            conversation_type=chatinfo["type"]
+        )
+
+        self.conversation_id = conversation_id,
+        self.chatinfo = chatinfo
+
+
+    def disconnect(self, chatid: str):
+        if chatid in self.active_connections:
+            del self.active_connections[chatid]
 
     async def broadcast(self, message: str, sender_id: str):
-        disconnected_clients = []
-        for client_id, connection in self.active_connections.items():
-            try:
-                if client_id != sender_id:  # Don't send message back to sender
-                    print(f"Sending message to {client_id}: {message}")
-                    await connection.send_text(f"{sender_id}: {message}")
-            except WebSocketDisconnect:
-                disconnected_clients.append(client_id)
-        
-        # Clean up disconnected clients
-        for client_id in disconnected_clients:
-            self.disconnect(client_id)
+        print(f"Broadcasting message: {message}")
+
+        try:
+            if sender_id in self.active_connections:
+                conn = self.active_connections[sender_id]
+            print(f"Sending message to {sender_id}: {message}")
+            await conn.send_text(f"{message}")
+        except WebSocketDisconnect:
+            print(f"Client {sender_id} disconnected")
+            self.disconnect(sender_id)
+
+
 
 manager = ConnectionManager()
