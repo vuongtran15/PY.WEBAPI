@@ -1,7 +1,9 @@
+import json
 import fastapi
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException
 from pydantic import BaseModel
 from utils.db_utils import get_db_connection
+import http.client
 
 router = fastapi.APIRouter()
 
@@ -34,5 +36,20 @@ async def login(login_data: LoginRequest):
 
 # Keep the original GET endpoint for backward compatibility
 @router.get("/login")
-async def login_get():
-    return {"message": "Hello World1"}
+async def login_get(username: str, password: str):
+    conn = http.client.HTTPSConnection("ros.reginamiracle.com", 8109)
+    payload = ''
+    headers = {}
+    conn.request("POST", "/common/login?username=" + username + "&password=" + password, payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    print(data.decode("utf-8"))
+    code_status = res.status
+    if code_status == 200:
+        # return convert data to json
+        json_data = data.decode("utf-8")
+        json_data = json.loads(json_data)
+        return json_data
+    else:
+        raise HTTPException(status_code=code_status, detail="Login failed")
+    
