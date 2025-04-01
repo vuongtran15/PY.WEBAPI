@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import WebSocket, WebSocketDisconnect
 from typing import  Dict
 
@@ -27,16 +28,12 @@ class ConnectionManager:
         db_context = AIDBContext()
         
         # Insert conversation to database with appropriate fields
-        conversation_id = db_context.insert_conversation(
+        db_context.insert_conversation(
             id=chatinfo["chat_id"],
             emp_id=chatinfo["emp_id"],
             title=f"New Conversation",
             conversation_type=chatinfo["type"]
         )
-
-        self.conversation_id = conversation_id,
-        self.chatinfo = chatinfo
-
 
     def disconnect(self, chatid: str):
         if chatid in self.active_connections:
@@ -49,9 +46,12 @@ class ConnectionManager:
             if sender_id in self.active_connections:
                 conn = self.active_connections[sender_id]
             print(f"Sending message to {sender_id}: {message}")
+            # wait 5s
+
+            await asyncio.sleep(2)
+
             await conn.send_text(f"{message}")
         except WebSocketDisconnect:
-            print(f"Client {sender_id} disconnected")
             self.disconnect(sender_id)
 
 
