@@ -32,6 +32,7 @@ class AIService:
                         "content": delta.content
                     }))
                     bot_reply += delta.content
+                    await asyncio.sleep(0.01)
             await websocket.send_text(json.dumps({
                 "msgid": msgid,
                 "dataType": "text",
@@ -44,6 +45,7 @@ class AIService:
                 "dataType": "text",
                 "content": 'END_OF_MESSAGE'
             }))
+            return ""
 
 
 aisvr = AIService()

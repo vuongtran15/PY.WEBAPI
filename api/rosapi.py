@@ -24,5 +24,12 @@ class ROSApi:
         res = conn.getresponse()
         data = (res.read()).decode("utf-8")
         return data
+    
+    def conversation_get_prompt(self, chatid: str):
+        conn = http.client.HTTPConnection(self.base_ip_adress, self.base_port)
+        conn.request("GET", "/api/aichat/server/message/prompt?conversationId=" + chatid)
+        res = conn.getresponse()
+        data = (res.read()).decode("utf-8")
+        return data
 
 rosapi = ROSApi()

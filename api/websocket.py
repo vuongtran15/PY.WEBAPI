@@ -6,7 +6,7 @@ import uuid
 
 from services.aidb_services import AIDBContext
 from api.rosapi import rosapi
-from services.ai_services import aisvr
+from services.command_service import cmdsvr
 # Initialize ROSApi
 
 
@@ -53,17 +53,15 @@ class ConnectionManager:
                 "uuid": parts[3]
             }
             rosapi.conversation_add_message(chatinfo["chat_id"], message)
-            response = rosapi.conversation_get_command(chatinfo["chat_id"])
-            # get object in command
-            response = json.loads(response)
-            conversation_id = response["ConversationId"]
-            prompt = list(response["Prompt"])
-            command = list(response["Command"])
+            # get command from server
+            command = rosapi.conversation_get_command(chatinfo["chat_id"])
+            command = json.loads(command)
+            command = list(command)
+            
             for cmd in command:
                 commandType = cmd["CommandType"]
                 if commandType == "TEXT_CHAT":
-                    msgid = uuid.uuid4()
-                    await aisvr.text_openai_chat(websocket, str(msgid), prompt)
+                    await cmdsvr.command_text_chat(websocket, chatinfo["chat_id"])
                 else:
                     await websocket.send_text(f"No command found for {commandType}!!")
 
