@@ -17,14 +17,12 @@ class ROSApi:
         conn.request("POST", "/api/aichat/server/message/add", json.dumps(payload), headers)
         res = conn.getresponse()
         data = (res.read()).decode("utf-8")
-        print(f"Response: {data}")
     
     def conversation_get_command(self, chatid: str):
         conn = http.client.HTTPConnection(self.base_ip_adress, self.base_port)
-        conn.request("GET", "/api/aichat/server/message/command?conversationId" + chatid)
+        conn.request("GET", "/api/aichat/server/message/command?conversationId=" + chatid)
         res = conn.getresponse()
         data = (res.read()).decode("utf-8")
-        print(f"Response: {data}")
         return data
 
 rosapi = ROSApi()
