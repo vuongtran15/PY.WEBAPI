@@ -1,8 +1,11 @@
 import asyncio
 from fastapi import WebSocket, WebSocketDisconnect
 from typing import  Dict
+import uuid
 
 from services.aidb_services import AIDBContext
+from api.rosapi import rosapi
+# Initialize ROSApi
 
 
 
@@ -39,20 +42,21 @@ class ConnectionManager:
         if chatid in self.active_connections:
             del self.active_connections[chatid]
 
-    async def broadcast(self, message: str, sender_id: str):
-        print(f"Broadcasting message: {message}")
-
+    async def broadcast(self, websocket: WebSocket, message: str, chatid: str):
         try:
-            if sender_id in self.active_connections:
-                conn = self.active_connections[sender_id]
-            print(f"Sending message to {sender_id}: {message}")
-            # wait 5s
+            parts = chatid.split("__")
+            chatinfo = {
+                "emp_id": parts[0],
+                "chat_id": parts[1],
+                "type": parts[2],
+                "uuid": parts[3]
+            }
+            rosapi.conversation_add_message(chatinfo["chat_id"], message)
 
-            await asyncio.sleep(2)
 
-            await conn.send_text(f"{message}")
+            await websocket.send_text(f"{message}")
         except WebSocketDisconnect:
-            self.disconnect(sender_id)
+            self.disconnect(chatid)
 
 
 

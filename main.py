@@ -18,6 +18,6 @@ async def websocket_endpoint(websocket: WebSocket, chatid: str):
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(data, chatid)
+            await manager.broadcast(websocket, data, chatid)
     except WebSocketDisconnect:
         manager.disconnect(chatid)
