@@ -16,7 +16,7 @@ class AIService:
     async def text_openai_chat(self, websocket: WebSocket, msgid: str, message: list) -> None:
         try:
             response = self.client.chat.completions.create(
-                model="gemma3:latest",
+                model="gemma3:27b",
                 messages=message,
                 stream=True
             )

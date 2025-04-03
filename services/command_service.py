@@ -17,7 +17,13 @@ class CommandServices:
 
             msgid = uuid.uuid4()
 
-            bot_reply =await aisvr.text_openai_chat(websocket, str(msgid), prompt)
+            await websocket.send_text(json.dumps({
+                "msgid": str(msgid),
+                "dataType": "text",
+                "content": "..."
+            }))
+
+            bot_reply = await aisvr.text_openai_chat(websocket, str(msgid), prompt)
 
             # save message to server
             msgModel = [
@@ -29,12 +35,12 @@ class CommandServices:
                     "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 }
             ]
-            
-            rosapi.conversation_add_message(chatid, json.dumps(msgModel))
 
+            rosapi.conversation_add_message(chatid, json.dumps(msgModel))
 
             return bot_reply
         except Exception as e:
             return ""
+
 
 cmdsvr = CommandServices()
