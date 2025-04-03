@@ -45,6 +45,8 @@ class ConnectionManager:
 
     async def broadcast(self, websocket: WebSocket, message: str, chatid: str):
         try:
+            print(f"Received message: {chatid} - {message}")
+
             parts = chatid.split("__")
             chatinfo = {
                 "emp_id": parts[0],
